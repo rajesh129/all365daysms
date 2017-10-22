@@ -2,7 +2,7 @@ var path = require("path");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var extractPlugin = new ExtractTextPlugin({
-    filename: "main.css"
+    filename: "assets/css/main.css"
 });
 
 var DIST_DIR = path.resolve(__dirname, "dist");
@@ -11,8 +11,8 @@ var SRC_DIR = path.resolve(__dirname, "client");
 var config = {
     entry: SRC_DIR + "/app/index.js",
     output: {
-        path: DIST_DIR + "/app",
-        filename: "bundle.js",
+        path: DIST_DIR,
+        filename: "app/bundle.js",
         publicPath: "/dist"
     },
     module: {
@@ -35,9 +35,17 @@ var config = {
                 use: extractPlugin.extract({
                     use: ["css-loader", "sass-loader"]
                 })
+            },
+            { 
+                test: /\.(png|woff|woff2|eot|ttf|svg)$/, 
+                loader: 'file-loader',
+                options: {
+                    outputPath: 'assets/fonts/'
+                }
             }
         ]
     },
+    devtool: 'source-map',
     plugins: [
         extractPlugin
     ]

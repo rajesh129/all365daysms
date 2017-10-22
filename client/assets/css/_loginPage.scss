@@ -1,0 +1,39 @@
+@import 'variables';
+.loginPage {
+    height: 100vh;
+    background-color: $loginPageBg;
+    display: table;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    .errorMsg {
+        background-color: $error;
+        display: block;
+        text-align: center;
+    }
+    .loginContainer {
+        display: table-cell;
+        vertical-align: middle;
+        max-width: 500px;
+        width: 100%;
+    }
+    .signUpSection, 
+    .signInSection {
+        text-align: left;
+        width: 30%;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 10px;
+        li {
+            margin-bottom: 10px;
+        }
+    }
+    .forgotPasswordLink {
+        float: right;
+        color: #fff;
+        &:hover { text-decoration: underline; }
+    }
+    button {
+        float: right;
+    }
+}

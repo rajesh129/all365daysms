@@ -1,0 +1,9 @@
+header {
+    background-color: $primaryColor;
+    height: 55px;
+    color: $defaultColor;
+    .profileDetails {
+        float: right;
+        padding: 20px;
+    }
+}

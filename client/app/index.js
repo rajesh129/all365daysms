@@ -1,13 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Login from './components/login'
+import App from './App';
 
-class App extends React.Component {
-    render() {
-        return <Login name="John" />;
-    }
-}
+import '../assets/css/main.scss';
 
-export default App;
 
 ReactDOM.render(<App />,document.getElementById('app'));

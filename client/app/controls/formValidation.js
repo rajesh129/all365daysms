@@ -19,7 +19,7 @@ export function validateNumber(num) {
 }
 
 export function validateLineBreak(line) {
-    var regex = /\n/g;
-    return regex.test(line);
+    var regex = (line.match(/\n/g)||[]).length;
+    console.log(regex);
 }
 

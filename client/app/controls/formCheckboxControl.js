@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {validateEmail, validateAlphabet, validatePhoneNumber} from './formValidation';
 
-class FormRadioControl extends React.Component {
+class FormCheckboxControl extends React.Component {
     constructor(props) {
         super(props);
         this.onClick = this.onClick.bind(this);
@@ -26,30 +25,30 @@ class FormRadioControl extends React.Component {
     }
     render() {
         const {
-            radioId,
+            id,
             name,
             text,
             defaultChecked
         } = this.props;
         return (
-            <div className="radioBoxWrapper">
-                <label htmlFor={radioId} >
+            <div className="checkBoxWrapper">
+                <label htmlFor={id} >
                     <input 
-                        type="radio" 
-                        id={radioId} 
+                        type="checkbox" 
+                        id={id} 
                         name={name} 
                         onClick={this.onClick} 
                         value={text} 
                         defaultChecked={defaultChecked != undefined || defaultChecked != "" ? defaultChecked : false} />
-                    <span><i>{text}</i></span>
+                    <span>{text}</span>
                 </label>
             </div>
         );
     }
 }
 
-FormRadioControl.propTypes = {
-    radioId: PropTypes.string.isRequired,
+FormCheckboxControl.propTypes = {
+    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     text: PropTypes.string,
     onChange: PropTypes.func,
@@ -58,5 +57,5 @@ FormRadioControl.propTypes = {
     defaultChecked: PropTypes.bool
 }
 
-export default FormRadioControl;
+export default FormCheckboxControl;
 

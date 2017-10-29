@@ -29,9 +29,11 @@ var config = {
                     }
                 ]
             },
+            { test: /\.css$/, loader: 'style-loader!css-loader'},
             {
                 test: /\.scss$/,
                 include: SRC_DIR,
+                exclude: '/node_modules/' ,
                 use: extractPlugin.extract({
                     use: ["css-loader", "sass-loader"]
                 })

@@ -11,16 +11,18 @@ class FormTextAreaControl extends React.Component {
         this.props.onChange && this.props.onChange(obj);
     }
     render() {
+        const {maxLength} = this.props;
         return (
             <div className="textAreaWrapper">
-                <textarea onChange={this.onChange}/>
+                <textarea onChange={this.onChange} maxLength={maxLength}/>
             </div>
         );
     }
 }
 
 FormTextAreaControl.propTypes = {
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    maxLength: PropTypes.number
 }
 
 export default FormTextAreaControl;

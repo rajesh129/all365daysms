@@ -1,15 +1,24 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import PropTypes from 'prop-types';
+import Datetime from 'react-datetime';
 import FormRadioControl from '../../controls/formRadioControl';
 import FormSelectBoxControl from '../../controls/formSelectBoxControl';
 import TextAreaControl from '../../controls/formTextareaControl';
+import FormCheckboxControl from '../../controls/formCheckboxControl'
 import {validateNumber, validateLineBreak} from '../../controls/formValidation';
 
 const senderID = [
     {id: 1, value: "Rajesh"},
     {id: 2, value: "Anonymous"}
-]
+];
+
+const chooseLanguage = [
+    {id: 1, value: "English"},
+    {id: 2, value: "Other"}
+];
+
+const maxMessages = 6;
 
 class SendSMS extends React.Component {
     constructor(props) {
@@ -24,6 +33,8 @@ class SendSMS extends React.Component {
         this.showErrorMsg = this.showErrorMsg.bind(this);
         this.onMessagesChange = this.onMessagesChange.bind(this);
         this.onMessagesSubmit = this.onMessagesSubmit.bind(this);
+        this.chooseLanguage = this.chooseLanguage.bind(this);
+        this.messageScheduled = this.messageScheduled.bind(this);
         this.senderid = "";
         this.recipients = "";
         this.messages = "";
@@ -42,6 +53,14 @@ class SendSMS extends React.Component {
                     isRecipientsActive: false,
                     recipientCount: 0,
                     recipients: ""
+                },
+                messages: {
+                    isMessagesActive: false,
+                    messagesCount: 0,
+                    messages: "",
+                    messagesCharLimit: 160,
+                    chooseLanguage: "English",
+                    isMessageScheduled: false
                 },
                 nextStep: ""
             },
@@ -72,6 +91,14 @@ class SendSMS extends React.Component {
                     isRecipientsActive: false,
                     recipientCount: 0,
                     recipients: ""
+                },
+                messages: {
+                    isMessagesActive: false,
+                    messagesCount: 0,
+                    messages: "",
+                    messagesCharLimit: 160,
+                    chooseLanguage: "English",
+                    isMessageScheduled: false
                 },
                 nextStep: ""
             },
@@ -131,8 +158,6 @@ class SendSMS extends React.Component {
     }
     onSenderidSubmit() {
         let sendSmsActions = this.state.sendSmsActions;
-        
-
         if(!sendSmsActions.senderid.isSenderidActive) {
             if(this.state.sendSmsActions.senderid.isSenderisReq && this.state.sendSmsActions.senderid.senderidValue === "") {
                 this.showErrorMsg("Please select sender id");
@@ -170,10 +195,11 @@ class SendSMS extends React.Component {
         else {
             if(validateNumber(e.target.value)) {
                 sendSmsActions.recipients.recipients = e.target.value;
-                sendSmsActions.recipients.recipientCount = sendSmsActions.recipients.recipients.replace(/[^\n]/g, '').length;
+                sendSmsActions.recipients.recipientCount = sendSmsActions.recipients.recipients.substr(0, e.selectionStart).split("\n").length;
             }
             else {
                 this.showErrorMsg("Invalid Recipients!");
+                sendSmsActions.recipients.recipientCount = 0;
             }
             this.setState({sendSmsActions: sendSmsActions});
         }
@@ -181,7 +207,6 @@ class SendSMS extends React.Component {
     }
 
     onRecipientSubmit() {
-        console.log("Recipient Click")
         let sendSmsActions = this.state.sendSmsActions;
         if(!sendSmsActions.recipients.isRecipientsActive) {
             if(this.state.sendSmsActions.recipients.recipients === "") {
@@ -198,12 +223,75 @@ class SendSMS extends React.Component {
         }
     }
 
-    onMessagesChange() {
-        console.log("Message Blur");
+    chooseLanguage(e) {
+        let sendSmsActions = this.state.sendSmsActions;
+        if(this.state.sendSmsActions.messages.isMessagesActive) {
+            this.openWarningBox(); 
+        }
+        else {
+            sendSmsActions.messages.chooseLanguage = e.target.value;
+            if(sendSmsActions.messages.chooseLanguage === "English")
+                sendSmsActions.messages.messagesCharLimit = 160;
+            else
+                sendSmsActions.messages.messagesCharLimit = 70;
+
+            this.setState({sendSmsActions: sendSmsActions});
+        }
+    }
+
+    onMessagesChange(e) {
+        let sendSmsActions = this.state.sendSmsActions;
+        let counter;
+        if(this.state.sendSmsActions.messages.isMessagesActive) {
+            this.openWarningBox(); 
+        }
+        else {
+            sendSmsActions.messages.messages = e.target.value;
+            if(sendSmsActions.messages.messages.length <= (this.state.sendSmsActions.messages.messagesCharLimit * (maxMessages - 1)))
+                counter = 1;
+            else
+                counter = 0;
+            
+            if(sendSmsActions.messages.messagesCount <= maxMessages) {
+
+                sendSmsActions.messages.messagesCount = Math.floor(sendSmsActions.messages.messages.length / this.state.sendSmsActions.messages.messagesCharLimit) + counter;
+            }
+            else {
+                this.showErrorMsg("Message count exceeded the limit");
+            }
+
+            console.log(sendSmsActions.messages.messages.length)
+
+            this.setState({sendSmsActions: sendSmsActions});
+        }
     }
 
     onMessagesSubmit() {
-        console.log("Message Submit");
+        let sendSmsActions = this.state.sendSmsActions;
+        if(!sendSmsActions.messages.isMessagesActive) {
+            if(this.state.sendSmsActions.messages.messages === "") {
+                this.showErrorMsg("Recipients should be empty");
+            }
+            else {
+                sendSmsActions.messages.isMessagesActive = true;
+                sendSmsActions.nextStep = "messages";
+                this.setState({sendSmsActions: sendSmsActions});
+            }
+        }
+        else {
+            this.openWarningBox();
+        }
+    }
+
+    messageScheduled(e) {
+        let sendSmsActions = this.state.sendSmsActions;
+        if(!sendSmsActions.messages.isMessageScheduled) {
+            sendSmsActions.messages.isMessageScheduled = true;
+        }
+        else {
+            sendSmsActions.messages.isMessageScheduled = false;
+        }
+        this.setState({sendSmsActions: sendSmsActions});
     }
 
     render() {
@@ -249,8 +337,42 @@ class SendSMS extends React.Component {
                         <div className="sendSmsTitle">
                             Messages
                         </div>
-                        <div className="sendSmsOptions">
-                            <TextAreaControl onChange={this.onMessagesChange} />
+                        <div className="sendSmsOptions messagesOptions">
+                            <TextAreaControl 
+                                onChange={this.onMessagesChange} 
+                                maxLength={this.state.sendSmsActions.messages.messagesCharLimit * maxMessages} />
+                            <div>
+                                {
+                                    this.state.sendSmsActions.messages.messagesCharLimit + 
+                                    " Characters remaining of " + 
+                                    this.state.sendSmsActions.messages.messagesCount +
+                                    "/" +
+                                    maxMessages +
+                                    "message(s)"
+                                }
+                                <br />
+                                <FormRadioControl 
+                                    radioId="english"
+                                    name="Choose Language"
+                                    text="English"
+                                    onClick={this.chooseLanguage}
+                                    defaultChecked={true} />
+                                <FormRadioControl 
+                                    radioId="other"
+                                    name="Choose Language"
+                                    text="Other"
+                                    onClick={this.chooseLanguage} />
+                            </div>
+                            <div>
+                                Schedule:
+                                <FormCheckboxControl 
+                                    id="messageSchedule"
+                                    name="messageSchedule"
+                                    onClick={this.messageScheduled} />
+                                {this.state.sendSmsActions.messages.isMessageScheduled && (
+                                    <Datetime />
+                                )}
+                            </div>
                         </div>
                         <div className="btnWrapper">
                             <button type="button" onClick={this.onMessagesSubmit}>Next</button>

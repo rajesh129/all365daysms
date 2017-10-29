@@ -4,12 +4,6 @@ const path = require('path');
 const webpack = require('webpack');
 const NODE_ENV = process.env.NODE_ENV;
 
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-
-const extractPlugin = new ExtractTextPlugin({
-    filename: "assets/css/main.css"
-});
-
 module.exports = {
   target: 'web',
 
@@ -47,14 +41,13 @@ module.exports = {
     new webpack.DefinePlugin({
       __ENV__: NODE_ENV,
     }),
-    extractPlugin,
   ],
 
   module: {
     loaders: [
       {
         test: /\.scss$/, // sass files
-        loader: ['style!css!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded', 'css-loader'],
+        loader: 'style!css!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded',
       },
       {
         test: /\.(ttf|eot|svg|woff)(\?[a-z0-9]+)?$/, // fonts files
